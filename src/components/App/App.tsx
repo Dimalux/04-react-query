@@ -34,10 +34,6 @@ export default function App() {
     setPage(1); // Скидаємо сторінку до 1 при новому пошуку
   };
 
-  const handlePageChange = ({ selected }: { selected: number }) => {
-    setPage(selected + 1);
-  };
-
   const handleSelectMovie = (movie: Movie) => {
     setSelectedMovie(movie);
   };
@@ -66,7 +62,7 @@ export default function App() {
               pageCount={moviesData.total_pages}
               pageRangeDisplayed={5}
               marginPagesDisplayed={1}
-              onPageChange={handlePageChange}
+              onPageChange={({ selected }) => setPage(selected + 1)}
               forcePage={page - 1}
               containerClassName={styles.pagination}
               activeClassName={styles.active}
