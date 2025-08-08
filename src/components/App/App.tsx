@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, keepPreviousData } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import ReactPaginate from "react-paginate";
 import { fetchMovies } from "../../services/movieService";
@@ -26,6 +26,7 @@ export default function App() {
     queryFn: () => fetchMovies(query, page),
     enabled: !!query, // Запит виконується тільки при наявності query
     staleTime: 120000, // 2 хвилини
+    placeholderData: keepPreviousData, //  Уникнення "миготіння" інтерфейсу під час повторних запитів
   });
 
   const handleSearch = (searchQuery: string) => {
