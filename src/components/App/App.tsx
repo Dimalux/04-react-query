@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import ReactPaginate from "react-paginate";
 import toast from "react-hot-toast";
+import ReactPaginate from "react-paginate";
 import { fetchMovies } from "../../services/movieService";
 import { Movie } from "../../types/movie";
 import SearchBar from "../SearchBar/SearchBar";
@@ -16,21 +16,21 @@ export default function App() {
   const [page, setPage] = useState(1);
   const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const {
+    data: moviesData,
+    isLoading,
+    isError,
+    isFetching,
+  } = useQuery({
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
-    enabled: false, // Запит не виконується автоматично
-    staleTime: 1000, // Дані вважаються свіжими 1 сек
+    enabled: !!query, // Запит виконується тільки при наявності query
+    staleTime: 120000, // 2 хвилини
   });
 
   const handleSearch = (searchQuery: string) => {
-    if (!searchQuery.trim()) {
-      toast.error("Please enter your search query.");
-      return;
-    }
     setQuery(searchQuery);
-    setPage(1);
-    refetch();
+    setPage(1); // Скидаємо сторінку до 1 при новому пошуку
   };
 
   const handlePageChange = ({ selected }: { selected: number }) => {
@@ -45,6 +45,11 @@ export default function App() {
     setSelectedMovie(null);
   };
 
+  // Показуємо повідомлення, якщо фільмів не знайдено
+  if (moviesData?.results.length === 0 && !isLoading && !isFetching) {
+    toast.error("No movies found for your request.");
+  }
+
   return (
     <div className={styles.app}>
       <SearchBar onSubmit={handleSearch} />
@@ -53,11 +58,11 @@ export default function App() {
 
       {isError && <ErrorMessage />}
 
-      {data && data.results.length > 0 && (
+      {moviesData && moviesData.results.length > 0 && (
         <>
-          {data.total_pages > 1 && (
+          {moviesData.total_pages > 1 && (
             <ReactPaginate
-              pageCount={data.total_pages}
+              pageCount={moviesData.total_pages}
               pageRangeDisplayed={5}
               marginPagesDisplayed={1}
               onPageChange={handlePageChange}
@@ -68,7 +73,8 @@ export default function App() {
               previousLabel="←"
             />
           )}
-          <MovieGrid movies={data.results} onSelect={handleSelectMovie} />
+
+          <MovieGrid movies={moviesData.results} onSelect={handleSelectMovie} />
         </>
       )}
 
