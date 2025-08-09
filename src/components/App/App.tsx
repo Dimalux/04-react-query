@@ -24,7 +24,7 @@ export default function App() {
   } = useQuery({
     queryKey: ["movies", query, page],
     queryFn: () => fetchMovies(query, page),
-    enabled: !!query, // Запит виконується тільки при наявності query
+    enabled: query !== "", // Запит виконується тільки при наявності query
     staleTime: 120000, // 2 хвилини
     placeholderData: keepPreviousData, //  Уникнення "миготіння" інтерфейсу під час повторних запитів
   });
