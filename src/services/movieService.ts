@@ -1,7 +1,14 @@
 import axios from "axios";
-import { MoviesResponse } from "../types/movie";
+import { Movie } from "../types/movie";
 
 const BASE_URL = "https://api.themoviedb.org/3";
+
+interface MoviesResponse {
+  results: Movie[];
+  total_pages: number;
+  total_results: number;
+  page: number;
+}
 
 export const fetchMovies = async (
   query: string,
